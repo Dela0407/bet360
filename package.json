@@ -9,10 +9,11 @@
     "build": "vite build",
     "lint": "oxlint",
     "test:api": "node --test server/index.test.js",
-    "test:netlify": "node --test netlify/functions/api.test.js",
+    "test:netlify": "node --test tests/netlify-api.test.js",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@netlify/database": "^2.0.1",
     "pg": "^8.23.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"

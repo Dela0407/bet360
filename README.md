@@ -16,7 +16,7 @@ This starts the Vite frontend and local Node API. The API uses SQLite at `data/b
 ## Deploy to Netlify
 
 1. Push the repository to GitHub and import it in Netlify. [Netlify's Vite setup](https://docs.netlify.com/build/frameworks/framework-setup-guides/vite/) is configured in `netlify.toml`: build command `npm run build`, publish directory `dist`, and functions directory `netlify/functions`.
-2. Create/enable a Netlify Database for the site. Netlify makes its connection string available to Functions as `NETLIFY_DB_URL`. The function also accepts `DATABASE_URL` for a PostgreSQL provider outside Netlify.
+2. Create/enable a Netlify Database for the site. The function connects through `@netlify/database`, which provisions the database automatically on first deploy and needs no connection string.
 3. Deploy. Netlify applies the SQL schema in `netlify/database/migrations` to the database as part of deployment. The account API function is routed to `/api/*`; no Vite proxy is used in production.
 4. Optionally set `BET360_PASSWORD_PEPPER` in Netlify's runtime environment-variable settings (Functions scope). Keep it private and retain the same value; changing it prevents existing users' passwords from validating.
 
