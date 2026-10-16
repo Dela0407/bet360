@@ -1,8 +1,7 @@
 import { createHash, randomBytes, randomInt, randomUUID, scrypt as scryptCallback, timingSafeEqual } from 'node:crypto'
 import { promisify } from 'node:util'
-import pg from 'pg'
+import { getDatabase } from '@netlify/database'
 
-const { Pool } = pg
 const scrypt = promisify(scryptCallback)
 const sessionLifetimeSeconds = 60 * 60 * 24 * 7
 const maxRequestBytes = 16 * 1024
@@ -14,12 +13,16 @@ const demoGames = new Map([
   ['virtual-basketball', { home: 'Green Hoops', away: 'Metro Stars', odds: 1.9 }],
   ['virtual-tennis', { home: 'A. Green', away: 'M. Court', odds: 1.9 }],
 ])
-const pool = new Pool({
-  connectionString: process.env.NETLIFY_DB_URL || process.env.DATABASE_URL,
-  max: 2,
-  idleTimeoutMillis: 10_000,
-  connectionTimeoutMillis: 5_000,
-})
+let database = null
+const pool = {
+  connect: () => db().pool.connect(),
+  query: (...args) => db().pool.query(...args),
+}
+
+function db() {
+  database ||= getDatabase()
+  return database
+}
 
 class ApiError extends Error {
   constructor(status, message) {
@@ -187,9 +190,6 @@ export default async function handler(request) {
   const secureCookie = url.protocol === 'https:'
   const route = url.pathname.replace(/\/+$/, '') || '/'
   try {
-    if (!process.env.NETLIFY_DB_URL && !process.env.DATABASE_URL) {
-      throw new Error('Missing NETLIFY_DB_URL database connection setting.')
-    }
     if (request.method !== 'GET') requireSameOrigin(request)
 
     if (route === '/api/health' && request.method === 'GET') {

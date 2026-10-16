@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { centsFromCredits, validateSelections } from './api.js'
+import { centsFromCredits, validateSelections } from '../netlify/functions/api.js'
 
 test('converts valid demo-credit amounts to integer cents', () => {
   assert.equal(centsFromCredits(10), 1000)
